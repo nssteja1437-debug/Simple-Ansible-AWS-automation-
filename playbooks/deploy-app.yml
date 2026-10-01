@@ -1,0 +1,34 @@
+---
+- name: Deploy python application
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Create application directory
+      ansible.builtin.file:
+        path: /opt/python-ansible-app
+        state: directory
+        mode: "0755"
+
+    - name: Copy python application
+      ansible.builtin.copy:
+        src: ../app/app.py
+        dest: /opt/python-ansible-app/app.py
+        mode: "0644"
+
+    - name: Copy requirements file
+      ansible.builtin.copy:
+        src: ../app/requirements.txt
+        dest: /opt/python-ansible-app/requirements.txt
+        mode: "0644"
+
+    - name: Create python virtual environment
+      ansible.builtin.command:
+        cmd: python3 -m venv /opt/python-ansible-app/venv
+        creates: /opt/python-ansible-app/venv/bin/python
+        
+    - name: Install python dependencies
+      ansible.builtin.pip:
+        requirements: /opt/python-ansible-app/requirements.txt
+        virtualenv: /opt/python-ansible-app/venv
+        

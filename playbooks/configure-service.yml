@@ -1,0 +1,25 @@
+---
+- name: Configure python application service
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Deploy systemd service file
+      ansible.builtin.template:
+        src: ../templates/myapp.service.j2
+        dest: /etc/systemd/system/myapp.service
+        mode: "0644"
+      notify: Restart Python application
+
+    - name: Enable python application service
+      ansible.builtin.systemd:
+        name: myapp
+        enabled: true
+        state: started
+        daemon_reload: true
+  handlers:
+    - name: Restart Python application
+      ansible.builtin.systemd:
+        name: myapp
+        state: restarted
+        daemon_reload: true

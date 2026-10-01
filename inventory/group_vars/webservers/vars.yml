@@ -1,0 +1,4 @@
+db_host: "my-postgres.cny8aekic4hb.ap-south-1.rds.amazonaws.com"
+db_name: "myappdb"
+db_user: "Admin_teja"
+db_port: "5432"

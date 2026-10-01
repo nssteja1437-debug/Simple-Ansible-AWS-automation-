@@ -1,0 +1,19 @@
+[Unit]
+Description=Python AWS Automation Application
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/opt/python-ansible-app
+
+Environment="DB_HOST={{ db_host }}"
+Environment="DB_NAME={{ db_name }}"
+Environment="DB_USER={{ db_user }}"
+Environment="DB_PASSWORD={{ db_password }}"
+Environment="DB_PORT={{ db_port }}"
+
+ExecStart=/opt/python-ansible-app/venv/bin/python /opt/python-ansible-app/app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
