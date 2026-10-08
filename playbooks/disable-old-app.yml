@@ -1,0 +1,15 @@
+---
+- name: Disable old systemd Flask application
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Stop old Flask service
+      service:
+        name: myapp
+        state: stopped
+
+    - name: Disable old Flask service at boot
+      service:
+        name: myapp
+        enabled: false

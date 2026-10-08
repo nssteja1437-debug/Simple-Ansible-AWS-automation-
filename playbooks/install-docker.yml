@@ -1,0 +1,26 @@
+---
+- name: Install and configure Docker
+  hosts: webservers
+  become: true
+
+  tasks:
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+
+    - name: Enable Docker at boot
+      service:
+        name: docker
+        enabled: yes

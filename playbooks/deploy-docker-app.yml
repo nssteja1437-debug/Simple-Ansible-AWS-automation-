@@ -1,0 +1,67 @@
+---
+- name: Deploy Flask application using Docker
+  hosts: webservers
+  become: true
+
+  tasks:
+
+    - name: Create application directory
+      file:
+        path: /opt/python-ansible-app
+        state: directory
+        mode: "0755"
+
+    - name: Copy application files
+      copy:
+        src: ../app/
+        dest: /opt/python-ansible-app/app/
+
+    - name: Copy Dockerfile
+      copy:
+        src: ../Dockerfile
+        dest: /opt/python-ansible-app/Dockerfile
+
+    - name: Copy dockerignore
+      copy:
+        src: ../.dockerignore
+        dest: /opt/python-ansible-app/.dockerignore
+
+    - name: Create runtime environment file
+      template:
+        src: ../templates/docker.env.j2
+        dest: /opt/python-ansible-app/.env
+        mode: "0600"
+
+    - name: Build Docker image
+      command:
+        cmd: docker build -t python-ansible-app:latest /opt/python-ansible-app
+
+    - name: Remove old test container if present
+      command:
+        cmd: docker rm -f python-ansible-app
+      failed_when: false
+      changed_when: false
+
+    - name: Run Docker container on port 5000
+      command:
+        cmd: >
+          docker run -d
+          --name python-ansible-app
+          --restart unless-stopped
+          --env-file /opt/python-ansible-app/.env
+          -p 5000:5000
+          python-ansible-app:latest
+
+    - name: Wait for Docker application
+      pause:
+        seconds: 3
+
+    - name: Test Docker health endpoint
+      uri:
+        url: http://127.0.0.1:5000/health
+        status_code: 200
+
+    - name: Test Docker database endpoint
+      uri:
+        url: http://127.0.0.1:5000/users
+        status_code: 200
